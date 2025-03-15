@@ -1,0 +1,84 @@
+version: '3.7'
+services:
+  kafka:
+    image: apache/kafka:latest
+    container_name: yolo-event
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@${KAFKA_HOST_IP}:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_HOST_IP}:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: controller
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_NODE_ID: 1
+    volumes:
+      - ./kafka_data:/var/lib/kafka/data
+
+  postgres:
+    image: postgres:14.7
+    container_name: yolo-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: yolo_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data # Persist data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Mount initialization script
+
+  connect:
+      image: confluentinc/cp-kafka-connect:latest
+      container_name: connect
+      ports:
+        - "8083:8083"
+      environment:
+        CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+        CONNECT_REST_ADVERTISED_HOST_NAME: connect
+        CONNECT_GROUP_ID: connect-group-1
+        CONNECT_CONFIG_STORAGE_TOPIC: connect-configs
+        CONNECT_OFFSET_STORAGE_TOPIC: connect-offsets
+        CONNECT_STATUS_STORAGE_TOPIC: connect-status
+        CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+        CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+        CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+        CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+        CONNECT_REST_PORT: 8083
+        CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
+      volumes:
+        - ./connect-config:/etc/kafka-connect
+        - ./confluentinc-kafka-connect-jdbc/lib:/usr/share/confluent-hub-components #mount the jdbc connector
+        - ./postgresql-driver:/usr/share/java #mount the postgres driver.
+      depends_on:
+        - kafka
+        - postgres
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-datasources:/etc/grafana/provisioning/datasources
+      - ./grafana-dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+    depends_on:
+      - postgres
+
+volumes:
+  grafana-data:
+
+networks:
+  default:
+    name: yolo-network # create a network, so that the containers can communicate using the container names.
