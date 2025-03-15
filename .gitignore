@@ -178,3 +178,4 @@ calibration_*.npy
 connect-config/postgresql-sink.json
 postgresql-driver
 confluentinc-kafka-connect-jdbc
+grafana-datasources/postgres.yaml

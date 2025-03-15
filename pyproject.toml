@@ -1,0 +1,33 @@
+[project]
+name = "yolo-event"
+version = "0.1.0"
+description = "Example on how to stream YOLO detections into Kafka."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    {name = "Burhan Qaddoumi"}
+]
+license = { "text" = "AGPL-3.0" }
+dependencies = [
+    "kafka-python>=2.0.6",
+    "msgpack>=1.1.0",
+    "ultralytics>=8.3.91",
+]
+
+
+[tool.ruff]
+indent-width = 4
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.format]
+line-ending = "auto"
+quote-style = "double"
+
+[tool.ruff.lint.pylint]
+max-returns = 1
+
+[tool.docformatter]
+wrap-summaries = 120
+wrap-descriptions = 120
+in-place = true
