@@ -21,6 +21,8 @@ services:
       KAFKA_NODE_ID: 1
     volumes:
       - ./kafka_data:/var/lib/kafka/data
+    networks:
+      - yolo-network
 
   postgres:
     image: postgres:14.7
@@ -34,6 +36,8 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data # Persist data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Mount initialization script
+    networks:
+      - yolo-network
 
   connect:
       image: confluentinc/cp-kafka-connect:latest
@@ -60,6 +64,8 @@ services:
       depends_on:
         - kafka
         - postgres
+      networks:
+      - yolo-network
 
   grafana:
     image: grafana/grafana:latest
@@ -75,6 +81,8 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
     depends_on:
       - postgres
+    networks:
+      - yolo-network
 
 volumes:
   grafana-data:
