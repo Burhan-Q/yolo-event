@@ -1,0 +1,10 @@
+apiVersion: 1
+datasources:
+  - name: PostgreSQL
+    type: postgres
+    url: postgres:5432
+    database: yolo_db
+    user:  # TODO: add your password
+    password:  # TODO: add your password
+    isDefault: true
+    editable: true
