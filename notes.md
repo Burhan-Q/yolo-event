@@ -290,3 +290,14 @@ curl -X POST -H "Content-Type: application/json" --data @connect-config/postgres
     ```
 
     Would be _really_ nice to be able to find a resource for debugging this issue.
+
+
+### References
+
+- https://rmoff.net/2018/12/15/docker-tips-and-tricks-with-kafka-connect-ksqldb-and-kafka/
+
+- https://hub.docker.com/r/apache/kafka
+
+- https://developer.confluent.io/courses/kafka-connect/intro/
+
+- https://docs.confluent.io/platform/current/connect/userguide.html
