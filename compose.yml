@@ -54,9 +54,10 @@ services:
       CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
+      # CLASS_PATH: /usr/share/confluent-hub-components  # NOTE legacy, not recommended but some plugins require it
     volumes:
       - ./connect-config:/etc/kafka-connect
-      - ./confluentinc-kafka-connect-jdbc/lib:/usr/share/confluent-hub-components #mount the jdbc connector
+      - ./confluentinc-kafka-connect-jdbc/lib/:/usr/share/confluent-hub-components #mount the jdbc connector
       - ./postgresql-driver:/usr/share/java #mount the postgres driver.
     depends_on:
       - yolo-event
