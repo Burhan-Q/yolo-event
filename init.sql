@@ -2,6 +2,7 @@ CREATE TABLE detections (
     id SERIAL PRIMARY KEY,
     device_id VARCHAR(255) NOT NULL,
     class_index INTEGER NOT NULL,
+    class_name VARCHAR(255) NOT NULL,
     confidence FLOAT NOT NULL,
     bbox FLOAT[] NOT NULL,
     timestamp BIGINT NOT NULL,
