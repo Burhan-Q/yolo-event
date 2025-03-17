@@ -11,6 +11,8 @@ license = { "text" = "AGPL-3.0" }
 dependencies = [
     "kafka-python>=2.0.6",
     "msgpack>=1.1.0",
+    "psycopg-pool>=3.2.6",
+    "psycopg>=3.2.6",
     "ultralytics>=8.3.91",
 ]
 
