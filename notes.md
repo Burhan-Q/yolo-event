@@ -301,3 +301,62 @@ curl -X POST -H "Content-Type: application/json" --data @connect-config/postgres
 - https://developer.confluent.io/courses/kafka-connect/intro/
 
 - https://docs.confluent.io/platform/current/connect/userguide.html
+
+
+## Testing and Troubleshooting
+
+### Testing
+
+1. Run services
+
+```sh
+docker compose up -d --build
+```
+
+2. Execute `producer.py` to submit test messages to broker.
+
+3. Check consumer messages (as needed).
+
+4. Check Postgres DB records
+
+    a. Connect to container
+
+    ```sh
+    docker exec -it yolo-postgres bash
+    ```
+
+    b. Connect to DB, use `POSTGRES_USER` from `.env` file.
+
+    ```sh
+    psql -U < POSTGRES_USER from .env > -d yolo_db
+    ```
+    
+    c. List all tables
+
+    ```sh
+    \dt
+    ```
+    
+    d Query target table to view records
+
+    ```sh
+    SELECT * FROM detections;
+    ```
+
+### Check Consumer Messages
+
+1. Connect to Kafka service container
+
+```sh
+docker exec -it kafka bash
+```
+
+2. Check messages
+
+```sh
+kafka-console-consumer \
+  --bootstrap-server kafka:29092 \
+  --topic class-0 \  # can use a different topic name as needed
+  --from-beginning
+```
+
