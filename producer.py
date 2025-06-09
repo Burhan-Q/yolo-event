@@ -2,10 +2,12 @@ import os
 import time
 
 import msgpack
+from dotenv import load_dotenv
 from kafka import KafkaProducer
 from ultralytics import YOLO
-from ultralytics.engine.results import Results
+from ultralytics.engine.results import Results, Boxes
 
+load_dotenv()
 ADDRESS = os.getenv("KAFKA_BOOSTRAP_SERVER_IP")
 PORT = os.getenv("KAFKA_BOOSTRAP_SERVER_PORT")
 if ADDRESS is None or PORT is None:
@@ -48,9 +50,9 @@ def process_result(r: Results, dev_id: str, time_stamp: int) -> list[dict]:
     Returns:
         list[dict]: A list of detection records.
     """
-    r_np = r.numpy()
+    np_boxes: Boxes = r.numpy().boxes  # type: ignore
     detections = []
-    for box, conf, cidx in zip(r_np.boxes.xyxy, r_np.boxes.conf, r_np.boxes.cls):
+    for box, conf, cidx in zip(np_boxes.xyxy, np_boxes.conf, np_boxes.cls):
         detections.append(
             dict(
                 device_id=dev_id,
@@ -87,7 +89,7 @@ def submit_to_topics(detections: list[dict]) -> None:
         send_data(f"class-{detect['class_index']}", detect)
 
 
-def run(src: str, weights: str = None, **pred_kwargs):
+def run(src: str, weights: str | None = None, **pred_kwargs):
     """
     Run the YOLO model on a video stream and submit the detection results to Kafka topics.
 
